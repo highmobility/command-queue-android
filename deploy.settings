@@ -1,0 +1,7 @@
+siteUrl = https://github.com/highmobility/command-queue-android
+gitUrl = https://github.com/highmobility/command-queue-android
+version = 1.0
+groupId = com.highmobility
+licenses = ['MIT']
+id = command-queue-android
+repo = gradle-dev-local

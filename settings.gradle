@@ -1,0 +1,3 @@
+def artifact = new Properties()
+artifact.load(new FileInputStream("deploy.settings"))
+rootProject.name = artifact.id
