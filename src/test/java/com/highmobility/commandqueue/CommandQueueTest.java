@@ -69,7 +69,7 @@ public class CommandQueueTest {
             responseCommand[0] = command;
         }
 
-        @Override public void onCommandFailed(CommandFailure reason, Command sentCommand) {
+        @Override public void onCommandFailed(CommandFailure reason, CommandQueue.QueueItem sentCommand) {
             failure[0] = reason;
         }
 

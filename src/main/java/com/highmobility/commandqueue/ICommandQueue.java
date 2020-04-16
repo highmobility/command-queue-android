@@ -33,9 +33,9 @@ public interface ICommandQueue {
      * Called after the user has called {@link CommandQueue#onCommandReceived(Bytes)}.
      *
      * @param command     The response.
-     * @param sentCommand The sent command. Null if didn't match with a sent command.
+     * @param sentCommand The sent command. Null if there isn't a matching sent command.
      */
-    void onCommandReceived(Command command, @Nullable CommandQueue.QueueItem sentCommand);
+    void onCommandReceived(Command command, @Nullable QueueItem sentCommand);
 
     /**
      * Called when a command failed. If this happens, the queue is cleared as well.
@@ -43,7 +43,7 @@ public interface ICommandQueue {
      * @param reason      The failure reason.
      * @param sentCommand The sent command.
      */
-    void onCommandFailed(CommandFailure reason, Command sentCommand);
+    void onCommandFailed(CommandFailure reason, QueueItem sentCommand);
 
     /**
      * Called when the command should be sent with either Ble or Telematics.

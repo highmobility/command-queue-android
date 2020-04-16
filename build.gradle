@@ -8,7 +8,10 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.0'
+
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.13.0"
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
+        classpath 'digital.wup:android-maven-publish:3.6.3'
     }
 }
 
@@ -32,8 +35,18 @@ ext.deps = [
         "findBugs": 'com.google.code.findbugs:jsr305:3.0.2'
 ]
 
-
 apply plugin: 'com.android.library'
+
+// deploy
+apply plugin: "maven"
+apply plugin: "com.jfrog.artifactory"
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'digital.wup.android-maven-publish'
+
+def artifact = new Properties()
+artifact.load(new FileInputStream("$projectDir/deploy.settings"))
+
+version artifact.version
 
 android {
     compileSdkVersion ver.compileSdk
@@ -81,4 +94,45 @@ dependencies {
     implementation "at.favre.lib:slf4j-timber:1.0.0"
 
     testImplementation 'junit:junit:4.12'
+}
+
+if (project.hasProperty('releaseType') == false || project.releaseType > 0) {
+    // deploy
+    def repo = project.hasProperty("repo") ? project.property("repo") : artifact.repo
+
+    task sourcesJar(type: Jar) {
+        archiveClassifier.set('sources')
+        from android.sourceSets.main.java.srcDirs
+    }
+
+    publishing {
+        publications {
+            aar(MavenPublication) {
+                from components.android
+                groupId artifact.groupId
+                // for bintray: https://github.com/bintray/gradle-bintray-plugin
+            }
+        }
+    }
+
+// artifactory
+    artifactory {
+        contextUrl = hmArtifactoryUrl
+
+        publish {
+            repository {
+                repoKey = repo
+                username = hmArtifactoryPublishUser
+                password = hmArtifactoryPublishPassword
+                maven = true
+            }
+
+            defaults {
+                publishArtifacts = true
+                publications('aar')
+                publishIvy = false
+                publishPom = true
+            }
+        }
+    }
 }

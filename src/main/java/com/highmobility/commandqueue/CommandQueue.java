@@ -171,7 +171,7 @@ public class CommandQueue {
         items.remove(item);
         CommandFailure failure = new CommandFailure(reason, item.failure, item.sdkError);
         purge();
-        listener.onCommandFailed(failure, item.commandSent);
+        listener.onCommandFailed(failure, item);
     }
 
     void startTimer() {
@@ -208,30 +208,6 @@ public class CommandQueue {
             }
         } else {
             stopTimer();
-        }
-    }
-
-    public class QueueItem<T extends Command> {
-        Command commandSent;
-
-        boolean timeout;
-        Object sdkError;
-        FailureMessage.State failure;
-        public Object info;
-
-        Calendar timeSent;
-        int retryCount;
-        @Nullable Class<T> responseClass;
-
-        public QueueItem(Command commandSent, @Nullable Class<T> responseClass) {
-            this.commandSent = commandSent;
-            this.responseClass = responseClass;
-        }
-
-        public QueueItem(Command commandSent, @Nullable Class<T> responseClass, Object info) {
-            this.commandSent = commandSent;
-            this.responseClass = responseClass;
-            this.info = info;
         }
     }
 }
