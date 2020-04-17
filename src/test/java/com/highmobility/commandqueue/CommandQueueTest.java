@@ -65,11 +65,11 @@ public class CommandQueueTest {
 
         @Override
         public void onCommandReceived(Command command,
-                                      @Nullable CommandQueue.QueueItem sentCommand) {
+                                      @Nullable QueueItem sentCommand) {
             responseCommand[0] = command;
         }
 
-        @Override public void onCommandFailed(CommandFailure reason, CommandQueue.QueueItem sentCommand) {
+        @Override public void onCommandFailed(CommandFailure reason, QueueItem sentCommand) {
             failure[0] = reason;
         }
 

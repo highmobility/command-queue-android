@@ -91,8 +91,8 @@ dependencies {
 
     implementation deps.findBugs
     implementation deps.timber
-    implementation "at.favre.lib:slf4j-timber:1.0.0"
 
+    testImplementation "at.favre.lib:slf4j-timber:1.0.0"
     testImplementation 'junit:junit:4.12'
 }
 
