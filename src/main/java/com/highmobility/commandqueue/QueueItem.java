@@ -7,6 +7,10 @@ import java.util.Calendar;
 
 import javax.annotation.Nullable;
 
+/**
+ *
+ * @param <T> expected response class
+ */
 public class QueueItem<T extends Command> {
     Command commandSent;
     Object info;

@@ -56,7 +56,7 @@ public class CommandQueueTest {
     final Command[] responseCommand = new Command[1];
     final int[] commandsSent = {0};
     final Command[] ackCommand = new Command[1];
-    final CommandFailure[] failure = new CommandFailure[1];
+    final QueueItemFailure[] failure = new QueueItemFailure[1];
 
     final IBleCommandQueue iQueue = new IBleCommandQueue() {
         @Override public void onCommandAck(Command queuedCommand) {
@@ -69,7 +69,7 @@ public class CommandQueueTest {
             responseCommand[0] = command;
         }
 
-        @Override public void onCommandFailed(CommandFailure reason, QueueItem sentCommand) {
+        @Override public void onCommandFailed(QueueItemFailure reason) {
             failure[0] = reason;
         }
 
@@ -168,7 +168,7 @@ public class CommandQueueTest {
         queue.onCommandFailedToSend(command, error);
         assertEquals(4, commandsSent[0]);
 
-        assertSame(failure[0].getReason(), CommandFailure.Reason.TIMEOUT);
+        assertSame(failure[0].getReason(), QueueItemFailure.Reason.TIMEOUT);
         LinkError linkError = ((LinkError) failure[0].getErrorObject());
         assertSame(linkError.getType(), LinkError.Type.TIME_OUT);
     }
@@ -211,7 +211,7 @@ public class CommandQueueTest {
         Thread.sleep(Link.commandTimeout + 20); //sends command again(no response)
         assertEquals(4, commandsSent[0]);
 
-        assertSame(failure[0].getReason(), CommandFailure.Reason.TIMEOUT);
+        assertSame(failure[0].getReason(), QueueItemFailure.Reason.TIMEOUT);
         assertNull(failure[0].getErrorObject());
     }
 
@@ -352,7 +352,7 @@ public class CommandQueueTest {
         assertEquals(5, commandsSent[0]); // assert get gas flap state sent 4x
         Thread.sleep((Link.commandTimeout + 20));
 
-        assertSame(failure[0].getReason(), CommandFailure.Reason.TIMEOUT);
+        assertSame(failure[0].getReason(), QueueItemFailure.Reason.TIMEOUT);
         assertNull(failure[0].getErrorObject());
     }
 
@@ -379,7 +379,7 @@ public class CommandQueueTest {
         queue.onCommandReceived(errorResponse);
         assertNull(responseCommand[0]);
 
-        assertSame(failure[0].getReason(), CommandFailure.Reason.FAILURE_RESPONSE);
+        assertSame(failure[0].getReason(), QueueItemFailure.Reason.FAILURE_RESPONSE);
         assertNull(failure[0].getErrorObject());
         assertSame(failure[0].getFailureResponse().getFailedMessageID().getValue(),
                 Doors.IDENTIFIER);

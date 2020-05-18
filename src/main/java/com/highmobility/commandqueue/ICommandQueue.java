@@ -40,10 +40,9 @@ public interface ICommandQueue {
     /**
      * Called when a command failed. If this happens, the queue is cleared as well.
      *
-     * @param reason      The failure reason.
-     * @param sentCommand The sent command.
+     * @param reason      The failure.
      */
-    void onCommandFailed(CommandFailure reason, QueueItem sentCommand);
+    void onCommandFailed(QueueItemFailure reason);
 
     /**
      * Called when the command should be sent with either Ble or Telematics.

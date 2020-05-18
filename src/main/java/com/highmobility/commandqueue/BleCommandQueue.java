@@ -58,14 +58,14 @@ public class BleCommandQueue extends CommandQueue {
     /**
      * Create the queue with default 3s extra timeout and 3x retry count.
      *
-     * @param listener The queue interface.
+     * @param listener The queue listener.
      */
     public BleCommandQueue(IBleCommandQueue listener) {
         this(listener, 45000, 3);
     }
 
     /**
-     * @param listener     The queue interface.
+     * @param listener     The queue listener.
      * @param extraTimeout Timeout in ms. Is added to {@link Link#commandTimeout} as an extra buffer
      *                     to receive the command response. Ack itself is timed out in the sdk after
      *                     {@link Link#commandTimeout}

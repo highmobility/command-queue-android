@@ -28,7 +28,6 @@ import com.highmobility.autoapi.CommandResolver;
 import com.highmobility.autoapi.FailureMessage;
 import com.highmobility.value.Bytes;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.concurrent.Executors;
@@ -159,19 +158,19 @@ public class CommandQueue {
         if (items.size() == 0) return;
         QueueItem item = items.get(0);
 
-        CommandFailure.Reason reason;
+        QueueItemFailure.Reason reason;
         if (item.failure != null) {
-            reason = CommandFailure.Reason.FAILURE_RESPONSE;
+            reason = QueueItemFailure.Reason.FAILURE_RESPONSE;
         } else if (item.sdkError != null && item.timeout == false) {
-            reason = CommandFailure.Reason.FAILED_TO_SEND;
+            reason = QueueItemFailure.Reason.FAILED_TO_SEND;
         } else {
-            reason = CommandFailure.Reason.TIMEOUT;
+            reason = QueueItemFailure.Reason.TIMEOUT;
         }
 
         items.remove(item);
-        CommandFailure failure = new CommandFailure(reason, item.failure, item.sdkError);
+        QueueItemFailure failure = new QueueItemFailure(item, reason, item.failure, item.sdkError);
         purge();
-        listener.onCommandFailed(failure, item);
+        listener.onCommandFailed(failure);
     }
 
     void startTimer() {

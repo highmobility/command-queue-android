@@ -38,7 +38,7 @@ import javax.annotation.Nullable;
  * <li>Receiving a failure response from the vehicle. {@link #failureResponse} will be present in
  * this case. The queue will be cleared after a failure response.</li>
  */
-public class CommandFailure {
+public class QueueItemFailure {
     public enum Reason {
         FAILED_TO_SEND, // the command did not reach vehicle. errorObject is filled in that case.
         TIMEOUT, // the command timed out.
@@ -46,8 +46,13 @@ public class CommandFailure {
     }
 
     Reason reason;
+    QueueItem item;
     @Nullable FailureMessage.State failureResponse; // a failure response
     @Nullable Object errorObject; // Issue in SDK before sending out the ble command.
+
+    public QueueItem getItem() {
+        return item;
+    }
 
     public Reason getReason() {
         return reason;
@@ -72,15 +77,16 @@ public class CommandFailure {
     }
 
     /**
-     * @return { @link {@link TelematicsError} } for Telematics queue,
-     * { @link {@link LinkError} } for Ble queue.
+     * @return { @link {@link TelematicsError} } for Telematics queue, { @link {@link LinkError} }
+     * for Ble queue.
      */
     @Nullable public Object getErrorObject() {
         return errorObject;
     }
 
-    CommandFailure(Reason reason, @Nullable FailureMessage.State failureResponse, @Nullable Object
-            errorObject) {
+    QueueItemFailure(QueueItem item, Reason reason,
+                     @Nullable FailureMessage.State failureResponse, @Nullable Object errorObject) {
+        this.item = item;
         this.reason = reason;
         this.failureResponse = failureResponse;
         this.errorObject = errorObject;
