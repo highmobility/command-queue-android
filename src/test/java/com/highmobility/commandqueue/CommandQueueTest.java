@@ -51,7 +51,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
-@RunWith(JUnit4.class)
 public class CommandQueueTest {
     final Command[] responseCommand = new Command[1];
     final int[] commandsSent = {0};

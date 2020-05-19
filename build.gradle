@@ -96,8 +96,9 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 }
 
-if (project.hasProperty('releaseType') == false || project.releaseType > 0) {
-    // deploy
+// deploy
+if (project.hasProperty("hmArtifactoryUrl") &&
+        (project.hasProperty('releaseType') == false || project.releaseType > 0)) {
     def repo = project.hasProperty("repo") ? project.property("repo") : artifact.repo
 
     task sourcesJar(type: Jar) {
@@ -115,7 +116,7 @@ if (project.hasProperty('releaseType') == false || project.releaseType > 0) {
         }
     }
 
-// artifactory
+    // artifactory
     artifactory {
         contextUrl = hmArtifactoryUrl
 
