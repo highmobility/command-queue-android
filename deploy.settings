@@ -4,4 +4,3 @@ version = 1.0
 groupId = com.highmobility
 licenses = MIT
 id = command-queue
-repo = gradle-dev-local
