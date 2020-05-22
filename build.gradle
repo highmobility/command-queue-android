@@ -19,7 +19,7 @@ repositories {
 
 // these are not release numbers. release numbers are in deploy.settings files.
 ext.ver = [
-        hmkit     : "2.0.2",
+        hmkit     : "2.0.3",
         autoApi   : "3.11.1",
         compileSdk: 29
 ]
