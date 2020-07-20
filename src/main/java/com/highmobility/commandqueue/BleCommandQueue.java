@@ -95,7 +95,7 @@ public class BleCommandQueue extends CommandQueue {
      *
      * @param command      The command that will be queued.
      * @param responseType The command's response type
-     * @param info         Some info that will be retained in the command
+     * @param info         Some info that will be retained in the QueueItem
      * @return false if cannot queue at this time - maybe this command type is already queued.
      */
     public <T extends Command> boolean queue(Command command, Class<T> responseType, Object info) {
