@@ -15,7 +15,7 @@ void sendCommands() {
   // send OpenGasFlap and only wait for the ack, not the GasFlapState response.
   queue.queue(new Fueling.ControlGasFlap(LockState.LOCKED, Position.CLOSED));
   // send HonkAndFlash straight after the OpenGasFlap ack.
-  queue.queue(new HonkHornFlashLights.HonkFlash(3, new Duration(3, Duration.Unit.SECONDS)));
+  queue.queue(new HonkHornFlashLights.HonkFlash(3, new Duration(3d, Duration.Unit.SECONDS)));
 }
 
 // forward all link communication to the queue.
