@@ -48,7 +48,11 @@ public class TelematicsCommandQueue extends CommandQueue {
 
     public TelematicsCommandQueue(ICommandQueue listener) {
         // timeout is irrelevant here, SDK will fail the command if there is a timeout.
-        super(listener, 120000, 0);
+        this(listener, new TelematicsQueueConfiguration(1, 0));
+    }
+
+    public TelematicsCommandQueue(ICommandQueue listener, TelematicsQueueConfiguration configuration) {
+        super(listener, configuration);
     }
 
     public void onCommandFailedToSend(Command command, TelematicsError error) {

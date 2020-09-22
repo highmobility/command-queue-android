@@ -32,7 +32,7 @@ import com.highmobility.value.Bytes;
  * Queue system for BLE commands that is meant to be used as a layer between the app and HMKit. An
  * item will wait for its ack ({@link #queue(Command)}) or for its response command ({@link
  * #queue(Command, Class)}) before next items will be sent. Ack timeout will come from the sdk.
- * Response command timeout is handled by this class(hence extraTimeout in ctor).
+ * Response command timeout is handled by this class(hence extraTimeout in configuration).
  * <p>
  * Command will succeed after ack or the expected response command via {@link ICommandQueue}
  * <p>
@@ -47,7 +47,7 @@ import com.highmobility.value.Bytes;
  * <ul>
  * <li> Command will fail without retrying if the SDK returns a LinkError or the response is a
  * Failure command. The queue will be cleared then as well.</li>
- * <li>Commands will be timed out after {@link Link#commandTimeout} + extraTimeout.</li>
+ * <li>Commands will be timed out after {@link Link#commandTimeout} + configuration.extraTimeout.</li>
  * <li>Commands will be tried again for {@link #retryCount} times. Commands with same type will not
  * be queued.</li>
  * </ul>
@@ -56,23 +56,20 @@ import com.highmobility.value.Bytes;
 public class BleCommandQueue extends CommandQueue {
 
     /**
-     * Create the queue with default 3s extra timeout and 3x retry count.
+     * Create the queue with default 45s extra timeout and 3x retry count.
      *
      * @param listener The queue listener.
      */
     public BleCommandQueue(IBleCommandQueue listener) {
-        this(listener, 45000, 3);
+        this(listener, new BleQueueConfiguration(45000, 3, 0));
     }
 
     /**
-     * @param listener     The queue listener.
-     * @param extraTimeout Timeout in ms. Is added to {@link Link#commandTimeout} as an extra buffer
-     *                     to receive the command response. Ack itself is timed out in the sdk after
-     *                     {@link Link#commandTimeout}
-     * @param retryCount   The amount of times a queue item is retried.
+     * @param listener      The queue listener.
+     * @param configuration The queue configuration
      */
-    public BleCommandQueue(IBleCommandQueue listener, long extraTimeout, int retryCount) {
-        super(listener, Link.commandTimeout + extraTimeout, retryCount);
+    public BleCommandQueue(IBleCommandQueue listener, BleQueueConfiguration configuration) {
+        super(listener, configuration);
     }
 
     /**
@@ -121,7 +118,7 @@ public class BleCommandQueue extends CommandQueue {
             ((IBleCommandQueue) listener).onCommandAck(item.commandSent);
             if (item.responseClass == null) {
                 items.remove(0);
-                sendItem();
+                sendItem(true);
             }
         }
     }

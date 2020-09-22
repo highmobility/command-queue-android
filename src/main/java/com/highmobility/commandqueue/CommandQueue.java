@@ -42,6 +42,8 @@ import java.util.concurrent.TimeUnit;
  * BleCommandQueue} or {@link TelematicsCommandQueue} should be used instead of this class.
  */
 public class CommandQueue {
+    long delayBeforeNextCommands = 0;
+
     ICommandQueue listener;
     long timeout;
     int retryCount;
@@ -50,10 +52,11 @@ public class CommandQueue {
     ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     ScheduledFuture<?> retryHandle;
 
-    CommandQueue(ICommandQueue listener, long timeout, int retryCount) {
+    CommandQueue(ICommandQueue listener, QueueConfiguration configuration) {
         this.listener = listener;
-        this.timeout = timeout;
-        this.retryCount = retryCount;
+        this.timeout = configuration.getTimeout();
+        this.retryCount = configuration.getRetryCount();
+        this.delayBeforeNextCommands = configuration.getDelayBeforeNextCommands();
         CommandResolver.setRuntime(CommandResolver.RunTime.ANDROID);
     }
 
@@ -95,7 +98,7 @@ public class CommandQueue {
             FailureMessage.State failure = (FailureMessage.State) command;
 
             if (failure.getCommandFailed(item.commandSent.getIdentifier(),
-                    item.commandSent.getType())) {
+                    item.commandSent.getCommandType())) {
                 item.failure = failure;
                 failItem();
             }
@@ -125,7 +128,7 @@ public class CommandQueue {
 
     boolean isSameCommand(Command firstCommand, Command secondCommand) {
         return (firstCommand.getIdentifier() == secondCommand.getIdentifier() &&
-                firstCommand.getType() == secondCommand.getType());
+                firstCommand.getCommandType() == secondCommand.getCommandType());
     }
 
     void sendItem() {

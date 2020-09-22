@@ -40,8 +40,6 @@ import com.highmobility.value.Bytes;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -51,7 +49,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
-public class CommandQueueTest {
+public class BleCommandQueueTest {
     final Command[] responseCommand = new Command[1];
     final int[] commandsSent = {0};
     final Command[] ackCommand = new Command[1];
@@ -86,7 +84,7 @@ public class CommandQueueTest {
 
     @Test public void responseAckDispatched() throws InterruptedException {
         // send lock, assert ack dispatched
-        BleCommandQueue queue = new BleCommandQueue(iQueue, 500, 3);
+        BleCommandQueue queue = new BleCommandQueue(iQueue, new BleQueueConfiguration(500, 3, 0));
         Command command = new Doors.LockUnlockDoors(LockState.LOCKED);
         queue.queue(command);
         Thread.sleep(50);
@@ -97,7 +95,7 @@ public class CommandQueueTest {
     @Test public void responseCommandDispatched() throws InterruptedException {
         // send lock, assert response dispatched after receiving commandResponse
 
-        BleCommandQueue queue = new BleCommandQueue(iQueue, 500, 3);
+        BleCommandQueue queue = new BleCommandQueue(iQueue, new BleQueueConfiguration(500, 3, 0));
         Command command = new Doors.LockUnlockDoors(LockState.LOCKED);
         queue.queue(command, Doors.State.class);
 
@@ -113,7 +111,7 @@ public class CommandQueueTest {
 
     @Test public void newCommandsNotSentWhenWaitingForAnAck() {
         boolean secondResult;
-        BleCommandQueue queue = new BleCommandQueue(iQueue, 500, 3);
+        BleCommandQueue queue = new BleCommandQueue(iQueue, new BleQueueConfiguration(500, 3, 0));
         Command command = new Doors.LockUnlockDoors(LockState.LOCKED);
         queue.queue(command);
         secondResult = queue.queue(command);
@@ -121,12 +119,12 @@ public class CommandQueueTest {
         assertEquals(false, secondResult);
         assertEquals(1, commandsSent[0]);
         queue.onCommandSent(command);
-        assertEquals(ackCommand[0].getType(), command.getType());
+        assertEquals(ackCommand[0].getCommandType(), command.getCommandType());
     }
 
     @Test public void newCommandsNotSentWhenWaitingForAResponse() {
         boolean secondResult;
-        BleCommandQueue queue = new BleCommandQueue(iQueue, 500, 3);
+        BleCommandQueue queue = new BleCommandQueue(iQueue, new BleQueueConfiguration(500, 3, 0));
         Command command = new Doors.LockUnlockDoors(LockState.LOCKED);
         queue.queue(command, Doors.State.class);
         secondResult = queue.queue(command, Doors.State.class);
@@ -144,7 +142,7 @@ public class CommandQueueTest {
         // assert retries are tried and command failed after. just dont send any callbacks.
         // set timeout to .05f. wait .07f, assert that command has been sent again.
 
-        BleCommandQueue queue = new BleCommandQueue(iQueue, -(Link.commandTimeout - 70), 3);
+        BleCommandQueue queue = new BleCommandQueue(iQueue, new BleQueueConfiguration(-(Link.commandTimeout - 70), 3, 0));
         Command command = new Doors.LockUnlockDoors(LockState.LOCKED);
         LinkError error = new LinkError(LinkError.Type.TIME_OUT, 0, "");
 
@@ -174,7 +172,7 @@ public class CommandQueueTest {
 
     @Test public void notSentCommandNotTriedAgain() {
         // assert that when sdk failed to send command, queue tries to send again
-        BleCommandQueue queue = new BleCommandQueue(iQueue, 10000, 3);
+        BleCommandQueue queue = new BleCommandQueue(iQueue, new BleQueueConfiguration(10000, 3, 0));
         Command command = new Doors.LockUnlockDoors(LockState.LOCKED);
         queue.queue(command, Doors.State.class);
 
@@ -187,7 +185,7 @@ public class CommandQueueTest {
     @Test public void responseCommandAckWillStillWaitForResponseAndTryAgain() throws
             InterruptedException {
         // send command, return ack, timeout, assert command sent again
-        BleCommandQueue queue = new BleCommandQueue(iQueue, 0, 3);
+        BleCommandQueue queue = new BleCommandQueue(iQueue, new BleQueueConfiguration(0, 3, 0));
         Command command = new Doors.LockUnlockDoors(LockState.LOCKED);
         queue.queue(command, Doors.State.class);
 
@@ -217,7 +215,7 @@ public class CommandQueueTest {
     @Test public void ackCommandRetriedAndDispatched() throws InterruptedException {
         // assert retries are tried and response dispatched after time
         // send command, return ack, timeout, assert command sent again
-        BleCommandQueue queue = new BleCommandQueue(iQueue, 0, 3);
+        BleCommandQueue queue = new BleCommandQueue(iQueue, new BleQueueConfiguration(0, 3, 0));
         Command command = new Doors.LockUnlockDoors(LockState.LOCKED);
         queue.queue(command);
         assertEquals(1, commandsSent[0]);
@@ -232,7 +230,7 @@ public class CommandQueueTest {
     }
 
     @Test public void responseCommandRetriedAndDispatched() throws InterruptedException {
-        BleCommandQueue queue = new BleCommandQueue(iQueue, 0, 3);
+        BleCommandQueue queue = new BleCommandQueue(iQueue, new BleQueueConfiguration(0, 3, 0));
         Command command = new Doors.LockUnlockDoors(LockState.LOCKED);
         queue.queue(command, Doors.State.class);
         Doors.State response = new Doors.State.Builder().addInsideLock(new Property<>(new Lock
@@ -257,7 +255,7 @@ public class CommandQueueTest {
 
     @Test public void multipleResponsesReceived() throws InterruptedException {
         // assert 2 queued items responses will both be dispatched
-        BleCommandQueue queue = new BleCommandQueue(iQueue, 0, 3);
+        BleCommandQueue queue = new BleCommandQueue(iQueue, new BleQueueConfiguration(0, 3, 0));
         Command firstCommand = new Doors.LockUnlockDoors(LockState.LOCKED);
         Command secondCommand = new Fueling.GetGasFlapState();
 
@@ -289,7 +287,7 @@ public class CommandQueueTest {
     }
 
     @Test public void ackAndResponseCommandResponsesReceived() throws InterruptedException {
-        BleCommandQueue queue = new BleCommandQueue(iQueue, 0, 3);
+        BleCommandQueue queue = new BleCommandQueue(iQueue, new BleQueueConfiguration(0, 3, 0));
         Command firstCommand = new Doors.LockUnlockDoors(LockState.LOCKED);
         Command secondCommand = new Trunk.ControlTrunk(LockState.LOCKED, Position.CLOSED);
         Command thirdCommand = new Fueling.ControlGasFlap(LockState.LOCKED, Position.OPEN);
@@ -327,7 +325,7 @@ public class CommandQueueTest {
     }
 
     @Test public void multipleResponsesReceivedSomeTimedOut() throws InterruptedException {
-        BleCommandQueue queue = new BleCommandQueue(iQueue, 0, 3);
+        BleCommandQueue queue = new BleCommandQueue(iQueue, new BleQueueConfiguration(0, 3, 0));
         Command firstCommand = new Doors.LockUnlockDoors(LockState.LOCKED);
         Command secondCommand = new Fueling.GetGasFlapState();
 
@@ -357,7 +355,7 @@ public class CommandQueueTest {
 
     @Test public void failureStopsQueue() throws InterruptedException {
         // assert command failure will be dispatched
-        BleCommandQueue queue = new BleCommandQueue(iQueue, 0, 3);
+        BleCommandQueue queue = new BleCommandQueue(iQueue, new BleQueueConfiguration(0, 3, 0));
         Command firstCommand = new Doors.LockUnlockDoors(LockState.LOCKED);
         Command secondCommand = new Fueling.GetGasFlapState();
 
@@ -388,7 +386,7 @@ public class CommandQueueTest {
     }
 
     @Test public void irrelevantCommandDispatchedQueueContinued() throws InterruptedException {
-        BleCommandQueue queue = new BleCommandQueue(iQueue, 0, 3);
+        BleCommandQueue queue = new BleCommandQueue(iQueue, new BleQueueConfiguration(0, 3, 0));
         Command firstCommand = new Doors.LockUnlockDoors(LockState.LOCKED);
 
         Command firstResponse =
@@ -422,6 +420,6 @@ public class CommandQueueTest {
     }*/
 
     boolean commandIs(@Nonnull Command command, Integer identifier, int commandType) {
-        return command.getIdentifier() == identifier && command.getType() == commandType;
+        return command.getIdentifier() == identifier && command.getCommandType() == commandType;
     }
 }
