@@ -39,8 +39,8 @@ import com.highmobility.value.Bytes;
  * </ul>
  * Be aware:
  * <ul>
- * <li>If there is an issue with a command, the queue will be cleared. There is no
- * retrying.</li></ul>
+ * <li>If there is an issue with a command, the queue will be cleared. Commands will be retried
+ * if there is http response 408(timeout).</li></ul>
  * <p>
  * Call {@link #purge()} to clear the queue if necessary.
  */
@@ -52,6 +52,6 @@ public class TelematicsCommandQueue extends CommandQueue {
     }
 
     public void onCommandFailedToSend(Command command, TelematicsError error) {
-        super.onCommandFailedToSend(command, error, false);
+        super.onCommandFailedToSend(command, error, error.getCode() == 408);
     }
 }

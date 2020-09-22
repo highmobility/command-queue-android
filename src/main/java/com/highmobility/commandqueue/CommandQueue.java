@@ -23,6 +23,8 @@
  */
 package com.highmobility.commandqueue;
 
+import android.os.Handler;
+
 import com.highmobility.autoapi.Command;
 import com.highmobility.autoapi.CommandResolver;
 import com.highmobility.autoapi.FailureMessage;
@@ -104,7 +106,7 @@ public class CommandQueue {
                 // received a command of expected type
                 listener.onCommandReceived(command, item);
                 items.remove(0);
-                sendItem();
+                sendItem(true);
             } else {
                 listener.onCommandReceived(command, null);
             }
@@ -127,12 +129,22 @@ public class CommandQueue {
     }
 
     void sendItem() {
+        sendItem(false);
+    }
+
+    void sendItem(boolean fromQueue) {
         if (items.size() == 0) return;
         QueueItem item = items.get(0);
 
         if (item.timeSent == null) {
             item.timeSent = Calendar.getInstance();
-            listener.sendCommand(item.commandSent);
+
+            if (fromQueue && delayBeforeNextCommands != 0) {
+                new Handler().postDelayed(() -> {
+                    listener.sendCommand(item.commandSent);
+                }, delayBeforeNextCommands);
+            } else listener.sendCommand(item.commandSent);
+
             startTimer();
         }
     }
