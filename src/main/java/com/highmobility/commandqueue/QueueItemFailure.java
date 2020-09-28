@@ -70,7 +70,7 @@ public class QueueItemFailure {
             return sdkError.getMessage();
         } else if (errorObject instanceof LinkError) {
             LinkError sdkError = (LinkError) errorObject;
-            return sdkError.getMessage();
+            return String.format("%s:%s", sdkError.getType(), sdkError.getMessage());
         }
 
         return null;

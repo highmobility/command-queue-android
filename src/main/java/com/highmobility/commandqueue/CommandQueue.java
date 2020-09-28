@@ -37,12 +37,14 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import static timber.log.Timber.d;
+
 /**
  * This is the Command queue base class. Depending on the environment, the subclasses {@link
  * BleCommandQueue} or {@link TelematicsCommandQueue} should be used instead of this class.
  */
 public class CommandQueue {
-    long delayBeforeNextCommands = 0;
+    long commandDelay = 0;
 
     ICommandQueue listener;
     long timeout;
@@ -56,7 +58,7 @@ public class CommandQueue {
         this.listener = listener;
         this.timeout = configuration.getTimeout();
         this.retryCount = configuration.getRetryCount();
-        this.delayBeforeNextCommands = configuration.getDelayBeforeNextCommands();
+        this.commandDelay = configuration.getCommandDelay();
         CommandResolver.setRuntime(CommandResolver.RunTime.ANDROID);
     }
 
@@ -109,7 +111,7 @@ public class CommandQueue {
                 // received a command of expected type
                 listener.onCommandReceived(command, item);
                 items.remove(0);
-                sendItem(true);
+                sendItem();
             } else {
                 listener.onCommandReceived(command, null);
             }
@@ -132,21 +134,19 @@ public class CommandQueue {
     }
 
     void sendItem() {
-        sendItem(false);
-    }
-
-    void sendItem(boolean fromQueue) {
         if (items.size() == 0) return;
         QueueItem item = items.get(0);
 
         if (item.timeSent == null) {
             item.timeSent = Calendar.getInstance();
 
-            if (fromQueue && delayBeforeNextCommands != 0) {
+            if (commandDelay != 0) {
                 new Handler().postDelayed(() -> {
                     listener.sendCommand(item.commandSent);
-                }, delayBeforeNextCommands);
-            } else listener.sendCommand(item.commandSent);
+                }, commandDelay);
+            } else {
+                listener.sendCommand(item.commandSent);
+            }
 
             startTimer();
         }

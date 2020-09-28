@@ -118,7 +118,7 @@ public class BleCommandQueue extends CommandQueue {
             ((IBleCommandQueue) listener).onCommandAck(item.commandSent);
             if (item.responseClass == null) {
                 items.remove(0);
-                sendItem(true);
+                sendItem();
             }
         }
     }
