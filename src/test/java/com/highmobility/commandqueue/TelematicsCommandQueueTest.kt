@@ -27,8 +27,7 @@ import com.highmobility.autoapi.Command
 import com.highmobility.autoapi.Doors
 import com.highmobility.autoapi.value.LockState
 import com.highmobility.hmkit.error.TelematicsError
-import org.junit.Assert
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 
@@ -58,7 +57,6 @@ class TelematicsCommandQueueTest {
     fun prepare() {
         responseCommand[0] = null
         commandsSent[0] = 0
-
     }
 
     @Test
@@ -69,21 +67,21 @@ class TelematicsCommandQueueTest {
         val error = TelematicsError(TelematicsError.Type.HTTP_ERROR, 408, "Timeout")
 
         queue.queue(command)
-        Assert.assertEquals(1, commandsSent[0])
+        assertEquals(1, commandsSent[0])
 
         Thread.sleep(40)
         queue.onCommandFailedToSend(command, error)
-        Assert.assertEquals(2, commandsSent[0])
+        assertEquals(2, commandsSent[0])
 
         Thread.sleep(40)
         queue.onCommandFailedToSend(command, error)
         Thread.sleep(40) // command is retried 1 times
 
-        Assert.assertEquals(2, commandsSent[0])
+        assertEquals(2, commandsSent[0])
 
-        Assert.assertSame(failure[0]!!.getReason(), QueueItemFailure.Reason.TIMEOUT)
-        val telematicsError = failure[0]!!.getErrorObject() as TelematicsError?
-        Assert.assertSame(telematicsError!!.type, TelematicsError.Type.HTTP_ERROR)
-        assertTrue(telematicsError!!.code == 408)
+        assertSame(failure[0]!!.getReason(), QueueItemFailure.Reason.TIMEOUT)
+        val telematicsError = failure[0]!!.getErrorObject() as TelematicsError
+        assertSame(telematicsError.type, TelematicsError.Type.HTTP_ERROR)
+        assertTrue(telematicsError.code == 408)
     }
 }
