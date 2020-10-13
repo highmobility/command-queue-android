@@ -34,11 +34,6 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
-def deploy = new Properties()
-deploy.load(new FileInputStream("$projectDir/deploy.settings"))
-
-version deploy.version
-
 android {
     compileSdkVersion ver.compileSdk
     buildToolsVersion "29.0.3"
