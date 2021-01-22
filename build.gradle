@@ -44,6 +44,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply from: "deploy.gradle"
+apply from: "https://raw.githubusercontent.com/tonisives/tools/master/gradle/deploy-android-v2.gradle"
 
 android {
     compileSdkVersion ver.compileSdk
@@ -78,7 +79,6 @@ dependencies {
             transitive = true
         }
         implementation deps.autoApi
-
     } else {
         implementation project(path: ':hmkit-android')
         implementation project(path: ':hmkit-crypto')
@@ -92,7 +92,3 @@ dependencies {
     testImplementation "at.favre.lib:slf4j-timber:1.0.0"
     testImplementation 'junit:junit:4.12'
 }
-
-// deploy script
-apply from: "https://raw.githubusercontent.com/tonisives/tools/master/gradle/deploy-android-v2.gradle"
-apply from: "https://raw.githubusercontent.com/tonisives/tools/master/gradle/test-shell-logging.gradle"
