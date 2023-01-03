@@ -17,7 +17,7 @@ repositories {
 
 ext.ver = [
         "hmkit-android"     : "2.0.6",
-        "hmkit-auto-api"    : "3.13.0",
+        "hmkit-auto-api"    : "13.1.1",
         "command-queue"     : "1.1.1",
         compileSdk          : 28
 ]
